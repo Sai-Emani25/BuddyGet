@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finance Analyzer</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <div class="app-header">
+            <div class="app-title">
+                <span class="app-logo">₹</span>
+                <div>
+                    <h1>BuddyGet</h1>
+                    <p>Track your spending and visualize where your money goes.</p>
+                </div>
+            </div>
+        </div>
+
+        <main class="app-main">
+            <!-- INPUTS + STATS -->
+            <section class="panel panel-top">
+                <div class="panel-content">
+                    <div class="inputs">
+                        <div class="field">
+                            <label for="dateInput">Date</label>
+                            <input type="date" id="dateInput" />
+                        </div>
+
+                        <div class="field">
+                            <label for="amountInput">Amount</label>
+                            <input
+                                type="number"
+                                id="amountInput"
+                                placeholder="Amount (₹)"
+                                step="0.01"
+                            />
+                        </div>
+
+                        <div class="field">
+                            <label for="categorySelect">Category</label>
+                            <select id="categorySelect">
+                                <option value="">Select existing</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label for="newCategoryInput">New category</label>
+                            <input
+                                type="text"
+                                id="newCategoryInput"
+                                placeholder="e.g. Food, Rent, Travel"
+                            />
+                        </div>
+
+                        <div class="field field-button">
+                            <button id="addTransactionBtn">
+                                <span>Add Expense</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Spent</div>
+                            <div class="stat-value" id="totalSpent">₹0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">This Month</div>
+                            <div class="stat-value" id="currentMonth">₹0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FILTER + CATEGORY LIST -->
+            <section class="panel panel-filters">
+                <div class="filters-row">
+                    <div class="filters-left">
+                        <label for="filterCategorySelect">Filter by category</label>
+                        <select id="filterCategorySelect">
+                            <option value="__all__">All categories</option>
+                        </select>
+                    </div>
+                    <div class="filters-right">
+                        <span id="filterInfo">Showing: All categories</span>
+                    </div>
+                </div>
+
+                <div class="categories-row">
+                    <div class="categories-title">Categories</div>
+                    <div class="categories-list" id="categoriesList">
+                        <!-- category chips injected here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHARTS -->
+            <section class="panel panel-charts">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2 id="categoryChartTitle">Spending by Category</h2>
+                        <span class="chip" id="categoryChartChip">All time • All categories</span>
+                    </div>
+                    <canvas id="categoryChart" style="max-width: 300px; max-height: 300px;"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2 id="monthlyChartTitle">Monthly Spending Trend</h2>
+                        <span class="chip" id="monthlyChartChip">All months • All categories</span>
+                    </div>
+                    <canvas id="monthlyChart" style="max-width: 300px; max-height: 300px;"></canvas>
+                </div>
+            </section>
+
+            <!-- TABLE -->
+            <section class="panel panel-table">
+                <div class="panel-heading">
+                    <h2>All Transactions</h2>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody"></tbody>
+                    </table>
+                    <div class="empty-state" id="emptyState">
+                        <p>No transactions yet. Add your first expense above.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
