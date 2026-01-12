@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <div class="app-shell">
         <div class="app-header">
@@ -18,131 +20,228 @@
                     <p>Track your spending and visualize where your money goes.</p>
                 </div>
             </div>
+            <div class="app-nav">
+                <button id="showExpenseBtn" class="nav-btn active">Expense</button>
+                <button id="showBuyListBtn" class="nav-btn">Buy List Saver</button>
+            </div>
         </div>
 
         <main class="app-main">
-            <!-- INPUTS + STATS -->
-            <section class="panel panel-top">
-                <div class="panel-content">
-                    <div class="inputs">
-                        <div class="field">
-                            <label for="dateInput">Date</label>
-                            <input type="date" id="dateInput" />
+            <!-- EXPENSE VIEW -->
+            <div id="expenseView">
+                <!-- INPUTS + STATS -->
+                <section class="panel panel-top">
+                    <div class="panel-content">
+                        <div class="inputs">
+                            <div class="field">
+                                <label for="dateInput">Date</label>
+                                <input type="date" id="dateInput" />
+                            </div>
+
+                            <div class="field">
+                                <label for="amountInput">Amount</label>
+                                <input type="number" id="amountInput" placeholder="Amount (₹)" step="0.01" />
+                            </div>
+
+                            <div class="field">
+                                <label for="categorySelect">Category</label>
+                                <select id="categorySelect">
+                                    <option value="">Select existing</option>
+                                </select>
+                            </div>
+
+                            <div class="field">
+                                <label for="newCategoryInput">New category</label>
+                                <input type="text" id="newCategoryInput" placeholder="e.g. Food, Rent, Travel" />
+                            </div>
+
+                            <div class="field field-button">
+                                <button id="addTransactionBtn">
+                                    <span>Add Expense</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="field">
-                            <label for="amountInput">Amount</label>
-                            <input
-                                type="number"
-                                id="amountInput"
-                                placeholder="Amount (₹)"
-                                step="0.01"
-                            />
+                        <div class="stats">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Spent</div>
+                                <div class="stat-value" id="totalSpent">₹0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">This Month</div>
+                                <div class="stat-value" id="currentMonth">₹0</div>
+                            </div>
                         </div>
+                    </div>
+                </section>
 
-                        <div class="field">
-                            <label for="categorySelect">Category</label>
-                            <select id="categorySelect">
-                                <option value="">Select existing</option>
+                <!-- FILTER + CATEGORY LIST -->
+                <section class="panel panel-filters">
+                    <div class="filters-row">
+                        <div class="filters-left">
+                            <label for="filterCategorySelect">Filter by category</label>
+                            <select id="filterCategorySelect">
+                                <option value="__all__">All categories</option>
                             </select>
                         </div>
-
-                        <div class="field">
-                            <label for="newCategoryInput">New category</label>
-                            <input
-                                type="text"
-                                id="newCategoryInput"
-                                placeholder="e.g. Food, Rent, Travel"
-                            />
-                        </div>
-
-                        <div class="field field-button">
-                            <button id="addTransactionBtn">
-                                <span>Add Expense</span>
-                            </button>
+                        <div class="filters-right">
+                            <span id="filterInfo">Showing: All categories</span>
                         </div>
                     </div>
 
-                    <div class="stats">
-                        <div class="stat-card">
-                            <div class="stat-label">Total Spent</div>
-                            <div class="stat-value" id="totalSpent">₹0</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">This Month</div>
-                            <div class="stat-value" id="currentMonth">₹0</div>
+                    <div class="categories-row">
+                        <div class="categories-title">Categories</div>
+                        <div class="categories-list" id="categoriesList">
+                            <!-- category chips injected here -->
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- FILTER + CATEGORY LIST -->
-            <section class="panel panel-filters">
-                <div class="filters-row">
-                    <div class="filters-left">
-                        <label for="filterCategorySelect">Filter by category</label>
-                        <select id="filterCategorySelect">
-                            <option value="__all__">All categories</option>
-                        </select>
+                <!-- CHARTS -->
+                <section class="panel panel-charts">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2 id="categoryChartTitle">Spending by Category</h2>
+                            <span class="chip" id="categoryChartChip">All time • All categories</span>
+                        </div>
+                        <canvas id="categoryChart" style="max-width: 300px; max-height: 300px;"></canvas>
                     </div>
-                    <div class="filters-right">
-                        <span id="filterInfo">Showing: All categories</span>
-                    </div>
-                </div>
 
-                <div class="categories-row">
-                    <div class="categories-title">Categories</div>
-                    <div class="categories-list" id="categoriesList">
-                        <!-- category chips injected here -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2 id="monthlyChartTitle">Monthly Spending Trend</h2>
+                            <span class="chip" id="monthlyChartChip">All months • All categories</span>
+                        </div>
+                        <canvas id="monthlyChart" style="max-width: 300px; max-height: 300px;"></canvas>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- CHARTS -->
-            <section class="panel panel-charts">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h2 id="categoryChartTitle">Spending by Category</h2>
-                        <span class="chip" id="categoryChartChip">All time • All categories</span>
+                <!-- TABLE -->
+                <section class="panel panel-table">
+                    <div class="panel-heading">
+                        <h2>All Transactions</h2>
                     </div>
-                    <canvas id="categoryChart" style="max-width: 300px; max-height: 300px;"></canvas>
-                </div>
 
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h2 id="monthlyChartTitle">Monthly Spending Trend</h2>
-                        <span class="chip" id="monthlyChartChip">All months • All categories</span>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsBody"></tbody>
+                        </table>
+                        <div class="empty-state" id="emptyState">
+                            <p>No transactions yet. Add your first expense above.</p>
+                        </div>
                     </div>
-                    <canvas id="monthlyChart" style="max-width: 300px; max-height: 300px;"></canvas>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <!-- TABLE -->
-            <section class="panel panel-table">
-                <div class="panel-heading">
-                    <h2>All Transactions</h2>
-                </div>
-
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Category</th>
-                                <th>Amount</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactionsBody"></tbody>
-                    </table>
-                    <div class="empty-state" id="emptyState">
-                        <p>No transactions yet. Add your first expense above.</p>
+            <!-- BUY LIST VIEW -->
+            <div id="buyListView" style="display: none;">
+                <section class="panel panel-top">
+                    <div class="panel-content">
+                        <div class="inputs">
+                            <div class="field">
+                                <label for="buyItemName">Item Name</label>
+                                <input type="text" id="buyItemName" placeholder="e.g. MacBook Pro" />
+                            </div>
+                            <div class="field">
+                                <label for="buyItemPrice">Target Price</label>
+                                <input type="number" id="buyItemPrice" placeholder="Price (₹)" step="0.01" />
+                            </div>
+                            <div class="field field-button">
+                                <button id="addBuyItemBtn">
+                                    <span>Add Item</span>
+                                </button>
+                            </div>
+                            <div class="field"
+                                style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 15px;">
+                                <label>Bank</label>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <span id="balanceBankValue"
+                                        style="font-size: 1.1rem; font-weight: 700; color: #60a5fa;">₹0</span>
+                                    <button id="addBalanceBtn" class="add-balance-mini-btn"
+                                        style="padding: 4px 8px; font-size: 0.65rem; max-width: 90px;">+ Funds</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+
+                <section class="panel panel-buylist">
+                    <div class="panel-heading">
+                        <h2>Your Buy List</h2>
+                        <p class="subtitle">Save money for your dreams, one step at a time.</p>
+                    </div>
+                    <div id="buyListContainer" class="buy-list-grid">
+                        <!-- Buy list items injected here -->
+                    </div>
+                    <div class="empty-state" id="buyListEmptyState" style="display: block;">
+                        <p>No items in your buy list. Start saving for something special!</p>
+                    </div>
+                </section>
+            </div>
         </main>
     </div>
 
+    <div id="moneyModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Money</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modalDescription"></p>
+                <div id="modalBalanceInfo" class="modal-balance-info" style="display: none;">
+                    Available in Bank: <span id="modalBankAvailable">₹0</span>
+                </div>
+                <div id="modalChoiceSection" class="modal-choices">
+                    <button id="choiceBank" class="choice-btn">
+                        <span class="choice-icon">🏦</span>
+                        <span class="choice-label">From Bank</span>
+                    </button>
+                    <button id="choiceManual" class="choice-btn">
+                        <span class="choice-icon">💵</span>
+                        <span class="choice-label">Manual Add</span>
+                    </button>
+                </div>
+                <div class="modal-input-group">
+                    <label for="modalAmountInput">Enter Amount</label>
+                    <input type="number" id="modalAmountInput" placeholder="₹ 0.00" step="0.01" />
+                </div>
+            </div>
+            <div class="modal-footer modal-actions-row">
+                <button id="modalRemoveBtn" class="confirm-btn remove-btn">Remove Money</button>
+                <button id="modalConfirmBtn" class="confirm-btn">Add Money</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="celebrationModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content celebration-content">
+            <div class="sparkles-container"></div>
+            <div class="modal-body celebration-body">
+                <div class="icon-celebrate">🏆</div>
+                <h2>Goal Completed!</h2>
+                <p id="celebrationMessage"></p>
+                <div class="celebration-stats">
+                    <div id="celebrationExcessInfo" style="display: none;">
+                        Excess of <span id="celebrationExcessAmount">₹0</span> added to your Bank!
+                    </div>
+                </div>
+                <button id="closeCelebrationBtn" class="confirm-btn celebrate-btn">Awesome!</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
     <script src="app.js"></script>
 </body>
+
 </html>
