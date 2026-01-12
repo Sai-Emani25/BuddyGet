@@ -43,6 +43,8 @@ const showBuyListBtn = document.getElementById("showBuyListBtn");
 // Buy List Inputs
 const buyItemNameInput = document.getElementById("buyItemName");
 const buyItemPriceInput = document.getElementById("buyItemPrice");
+const buyItemCategorySelect = document.getElementById("buyItemCategorySelect");
+const buyItemNewCategoryInput = document.getElementById("buyItemNewCategory");
 const addBuyItemBtn = document.getElementById("addBuyItemBtn");
 const buyListContainer = document.getElementById("buyListContainer");
 const buyListEmptyState = document.getElementById("buyListEmptyState");
@@ -141,6 +143,17 @@ function rebuildCategories() {
         currentFilterCategory = "__all__";
     }
     filterCategorySelect.value = currentFilterCategory;
+
+    // buy list category select
+    if (buyItemCategorySelect) {
+        buyItemCategorySelect.innerHTML = '<option value="">Select existing</option>';
+        categories.forEach((cat) => {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            buyItemCategorySelect.appendChild(option);
+        });
+    }
 
     // chips row
     renderCategoryChips();
@@ -392,25 +405,33 @@ function updateStats() {
 function addBuyItem() {
     const name = buyItemNameInput.value.trim();
     const price = parseFloat(buyItemPriceInput.value);
+    const selectedCategory = buyItemCategorySelect.value;
+    const newCategory = buyItemNewCategoryInput.value.trim();
 
-    if (!name || isNaN(price) || price <= 0) {
-        showToast("Please enter a valid item name and price.");
+    if (!name || isNaN(price) || price <= 0 || (!selectedCategory && !newCategory)) {
+        showToast("Please enter a valid item name, price, and category.");
         return;
     }
+
+    const category = selectedCategory || newCategory;
 
     const item = {
         id: Date.now(),
         name,
         price,
         saved: 0,
+        category,
     };
 
     buyList.push(item);
     persist();
+    rebuildCategories();
     renderBuyList();
 
     buyItemNameInput.value = "";
     buyItemPriceInput.value = "";
+    buyItemNewCategoryInput.value = "";
+    buyItemCategorySelect.value = "";
 }
 
 function deleteBuyItem(id) {
@@ -484,14 +505,30 @@ function confirmModal(isRemoval = false) {
                 balanceBank -= amount;
             }
             item.saved += amount;
-            
+
             if (item.saved >= item.price) {
                 const excess = item.saved - item.price;
+
+                // Add to transactions
+                const tx = {
+                    id: Date.now(),
+                    date: new Date().toISOString().slice(0, 10),
+                    category: item.category || "Buy List",
+                    amount: item.price, // Only the item cost is an expense
+                };
+                transactions.unshift(tx);
+
                 showCelebration(item.name, excess);
                 deleteBuyItem(item.id);
                 if (excess > 0) {
                     balanceBank += excess;
                 }
+
+                // Update UI for expense view too
+                rebuildCategories();
+                renderTransactions();
+                updateCharts();
+                updateStats();
             }
         }
     } else if (modalContext.type === "balance") {
